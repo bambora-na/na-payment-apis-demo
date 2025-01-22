@@ -1,0 +1,37 @@
+name: Mirror Repository
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Adjust as needed
+  workflow_dispatch:  # Allows for manual trigger
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Target
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Backup Workflows
+      run: |
+        mkdir backup
+        cp -R .github backup/
+
+    - name: Add Source Remote
+      run: |
+        git remote add source https://github.com/bambora/na-payment-apis-demo.git
+        git fetch --all
+
+    - name: Restore Workflows
+      run: |
+        cp -R backup/.github .github/
+        rm -rf backup
+
+    - name: Force Push to Target
+      env:
+        TARGET_REPO: https://github.com/bambora-na/na-payment-apis-demo.git
+      run: |
+        git push --mirror ${{ env.TARGET_REPO }}
