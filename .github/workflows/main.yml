@@ -25,6 +25,12 @@ jobs:
         git remote add source https://github.com/bambora/na-payment-apis-demo.git
         git fetch --all
 
+    - name: Reset Master Branch
+      run: |
+        git checkout source/master
+        git branch -D master || true
+        git checkout -b master
+
     - name: Restore Workflows
       run: |
         cp -R backup/.github .github/
